@@ -1,6 +1,8 @@
 import os
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
+from utils.logger import logger
+from tools import register_tools
 
 load_dotenv()
 
@@ -8,42 +10,17 @@ GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 mcp = FastMCP("Github MCP Server")
 
-
-import requests
-
-@mcp.tool()
-def get_profile():
-    """Get the authenticated user's GitHub profile information"""
-
-    url = "https://api.github.com/user"
-
-    headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json"
-    }
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        return {
-            "error": "Failed to fetch profile",
-            "status_code": response.status_code
-        }
-
-    data = response.json()
-
-    return {
-        "username": data["login"],
-        "name": data.get("name"),
-        "bio": data.get("bio"),
-        "followers": data["followers"],
-        "following": data["following"],
-        "public_repos": data["public_repos"]
-    }
-
+register_tools(mcp)
 
 def main():
-  mcp.run(transport="stdio")
+  logger.info("Starting GitHub MCP Server")
+  try:
+    mcp.run(transport="stdio")
+  except Exception as e:
+    logger.error(f"MCP Server error: {e}", exc_info=True)
+    raise
+  finally:
+    logger.info("GitHub MCP Server stopped")
 
 if __name__ == "__main__":
   main()
