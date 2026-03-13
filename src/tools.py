@@ -7,7 +7,7 @@ from utils.logger import logger
 load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_URL = "https://api.github.com/user"
+GITHUB_URL = "https://api.github.com"
 
 def register_tools(mcp):
   
@@ -17,13 +17,15 @@ def register_tools(mcp):
     
     logger.info("GitHub profile request received")
 
+    url = f"{GITHUB_URL}/user"
+
     headers = {
         "Authorization": f"Bearer {GITHUB_TOKEN}",
         "Accept": "application/vnd.github+json"
     }
 
     try:
-      response = requests.get(url=GITHUB_URL, headers=headers)
+      response = requests.get(url=url, headers=headers)
       
       if response.status_code != 200:
           logger.error(f"GitHub API failed with status {response.status_code}")
